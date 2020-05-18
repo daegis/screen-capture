@@ -1,6 +1,11 @@
 package cn.aegisa.analyst.screen.capture.schedule;
 
+import cn.aegisa.analyst.screen.capture.service.OcrCenter;
+import cn.aegisa.analyst.screen.capture.vo.OcrWrapper;
+import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -20,14 +25,20 @@ import java.time.format.DateTimeFormatter;
 @Slf4j
 public class ScreenTimer {
 
+    @Value("${screen.cap.folder}")
+    private String sysFolder;
+
+    @Autowired
+    private OcrCenter ocrCenter;
+
     @Scheduled(cron = "0/5 * * * * ?")
     public void doTimer() throws Exception {
-        captureScreen("d:\\screen", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))+".png");
+        captureScreen(sysFolder, LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")) + ".png");
     }
 
-    public static void captureScreen(String FOLDER, String fileName) throws Exception {
+    public void captureScreen(String FOLDER, String fileName) throws Exception {
         Dimension screenSize = new Dimension();
-        screenSize.setSize(1920,1080);
+        screenSize.setSize(1920, 1080);
         Rectangle screenRectangle = new Rectangle(screenSize);
         Robot robot = new Robot();
         BufferedImage image = robot.createScreenCapture(screenRectangle);
@@ -38,7 +49,9 @@ public class ScreenTimer {
         }
         File f = new File(screenFile, fileName);
         ImageIO.write(image, "png", f);
-        log.info("saved:{}",f.getName());
+        log.info("saved:{}", f.getName());
+        OcrWrapper ocrWrapper = ocrCenter.doOCR(sysFolder + "/" + fileName);
+        log.info(JSON.toJSONString(ocrWrapper));
     }
 
 }
