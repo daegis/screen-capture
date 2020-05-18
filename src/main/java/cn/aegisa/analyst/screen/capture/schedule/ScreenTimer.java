@@ -1,6 +1,8 @@
 package cn.aegisa.analyst.screen.capture.schedule;
 
+import cn.aegisa.analyst.screen.capture.push.DingPusher;
 import cn.aegisa.analyst.screen.capture.service.OcrCenter;
+import cn.aegisa.analyst.screen.capture.vo.OcrNode;
 import cn.aegisa.analyst.screen.capture.vo.OcrWrapper;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -15,6 +18,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 /**
  * Using IntelliJ IDEA.
@@ -31,7 +35,14 @@ public class ScreenTimer {
     @Autowired
     private OcrCenter ocrCenter;
 
-    @Scheduled(cron = "0/5 * * * * ?")
+    @Autowired
+    private DingPusher dingPusher;
+
+    private String currentLevel = "";
+
+    private String currentExp = "";
+
+    @Scheduled(cron = "0/10 * * * * ?")
     public void doTimer() throws Exception {
         captureScreen(sysFolder, LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")) + ".png");
     }
@@ -52,6 +63,21 @@ public class ScreenTimer {
         log.info("saved:{}", f.getName());
         OcrWrapper ocrWrapper = ocrCenter.doOCR(sysFolder + "/" + fileName);
         log.info(JSON.toJSONString(ocrWrapper));
+        List<OcrNode> wordsResult = ocrWrapper.getWords_result();
+        if (wordsResult != null) {
+            for (OcrNode ocrNode : wordsResult) {
+                String words = ocrNode.getWords();
+                if (!StringUtils.isEmpty(words)) {
+                    if (words.contains("当前等级")) {
+                        if (!words.equals(currentLevel)) {
+                            // 和目前存的不一样 发送提醒+更新
+                            currentLevel = words;
+                            dingPusher.push(words);
+                        }
+                    }
+                }
+            }
+        }
     }
 
 }

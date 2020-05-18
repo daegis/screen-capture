@@ -1,5 +1,6 @@
 package cn.aegisa.analyst.screen.capture;
 
+import cn.aegisa.analyst.screen.capture.push.DingPusher;
 import cn.aegisa.analyst.screen.capture.service.OcrCenter;
 import cn.aegisa.analyst.screen.capture.vo.OcrWrapper;
 import com.alibaba.fastjson.JSON;
@@ -14,6 +15,9 @@ class ScreenCaptureApplicationTests {
     @Autowired
     private OcrCenter ocrCenter;
 
+    @Autowired
+    private DingPusher dingPusher;
+
     @Value("${screen.cap.folder}")
     private String sysFolder;
 
@@ -21,6 +25,11 @@ class ScreenCaptureApplicationTests {
     void contextLoads() {
         OcrWrapper ocr = ocrCenter.doOCR(sysFolder + "/20200518133600.jpg");
         System.out.println(JSON.toJSONString(ocr));
+    }
+
+    @Test
+    public void test02(){
+        dingPusher.push("谈的咋样呀");
     }
 
 }

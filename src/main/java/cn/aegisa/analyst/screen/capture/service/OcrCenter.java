@@ -41,8 +41,6 @@ public class OcrCenter {
         options.put("detect_direction", "true");
         options.put("detect_language", "true");
         options.put("probability", "true");
-
-
         // 参数为本地图片路径
         JSONObject res = client.basicAccurateGeneral(filePath, options);
         String jsonBody = res.toString(2);
