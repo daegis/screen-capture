@@ -44,6 +44,7 @@ public class ScreenTimer {
         byte[] bytes = bos.toByteArray();
         ByteArrayInputStream is = new ByteArrayInputStream(bytes);
         minioClient.putObject("screen", "current_screen.png", is, "image/png");
+        log.info("upload success");
     }
 
 }
