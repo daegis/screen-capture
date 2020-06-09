@@ -28,7 +28,7 @@ public class ScreenTimer {
     @Autowired
     private DingPusher dingPusher;
 
-    @Scheduled(cron = "0 0/5 * * * ?")
+    @Scheduled(cron = "0/10 * * * * ?")
     public void doTimer() throws Exception {
         captureScreen();
     }
