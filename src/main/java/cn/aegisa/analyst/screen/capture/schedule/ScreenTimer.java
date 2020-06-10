@@ -4,6 +4,7 @@ import cn.aegisa.analyst.screen.capture.push.DingPusher;
 import io.minio.MinioClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +23,12 @@ import java.io.ByteArrayOutputStream;
 @Slf4j
 public class ScreenTimer {
 
+    @Value("${sc.cap.width}")
+    private Integer width;
+
+    @Value("${sc.cap.height}")
+    private Integer height;
+
     @Autowired
     private MinioClient minioClient;
 
@@ -35,7 +42,7 @@ public class ScreenTimer {
 
     public void captureScreen() throws Exception {
         Dimension screenSize = new Dimension();
-        screenSize.setSize(1920, 1080);
+        screenSize.setSize(width, height);
         Rectangle screenRectangle = new Rectangle(screenSize);
         Robot robot = new Robot();
         BufferedImage image = robot.createScreenCapture(screenRectangle);
@@ -44,7 +51,7 @@ public class ScreenTimer {
         byte[] bytes = bos.toByteArray();
         ByteArrayInputStream is = new ByteArrayInputStream(bytes);
         minioClient.putObject("screen", "current_screen.png", is, "image/png");
-        log.info("upload success");
+        log.info("{}*{}captured,upload success", width, height);
     }
 
 }
