@@ -12,9 +12,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class MinioConfig {
 
-    public static final String URL = "http://dev.aegisa.cn:9100/";
-    public static final String KEY = "jdminio";
-    public static final String SEC = "cool170402";
+    public static final String URL = "http://oss.ihna.cn/";
+    public static final String KEY = "admin";
+    public static final String SEC = "08031024";
 
     @Bean
     public MinioClient minioClient() throws Exception {

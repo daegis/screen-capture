@@ -28,18 +28,18 @@ public class TestMinio extends BaseTester {
 
     @Test
     public void test02() throws Exception {
-        File file = new File("/Users/xianyingda/Downloads/WechatIMG45.png");
+        File file = new File("/Users/xianyingda/Downloads/current_screen.png");
         FileInputStream fis = new FileInputStream(file);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         IoUtil.copy(fis, bos);
         byte[] bytes = bos.toByteArray();
         ByteArrayInputStream is = new ByteArrayInputStream(bytes);
-        minioClient.putObject("screen", "current_screen.png", is, "image/png");
+        minioClient.putObject("test", "current_screen.png", is, "image/png");
     }
 
     @Test
     public void test03() throws Exception{
-        String screen = minioClient.presignedGetObject("screen", "current_screen.png");
+        String screen = minioClient.presignedGetObject("test", "current_screen.png");
         System.out.println("screen = " + screen);
     }
 }
